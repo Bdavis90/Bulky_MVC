@@ -1,3 +1,6 @@
+using BulkyBook.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace BulkyBook
 {
     public class Program
@@ -8,6 +11,10 @@ namespace BulkyBook
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             var app = builder.Build();
 
