@@ -24,9 +24,19 @@ namespace BulkyBook.Controllers
         [HttpPost]
         public IActionResult Create(Category category)
         {
-            _context.Add(category);
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+            if (category.Name == category.DisplayOrder.ToString())
+            {
+                ModelState.AddModelError("name", "The Display Order cannot match the Name");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(category);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return View();
         }
 
 
