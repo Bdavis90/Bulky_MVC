@@ -1,3 +1,5 @@
+using Bulky.DAL.Repository;
+using Bulky.DAL.Repository.Interface;
 using Bulky.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,7 @@ namespace BulkyBook
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
