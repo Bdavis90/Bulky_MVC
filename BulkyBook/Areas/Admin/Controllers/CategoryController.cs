@@ -2,8 +2,9 @@
 using Bulky.DAL.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BulkyBook.Controllers
+namespace BulkyBook.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private IUnitOfWork _unitOfWork;
@@ -93,7 +94,7 @@ namespace BulkyBook.Controllers
         {
             var category = _unitOfWork.CategoryRepository.Get(u => u.Id == id);
 
-            if(category is null)
+            if (category is null)
             {
                 return NotFound();
             }
