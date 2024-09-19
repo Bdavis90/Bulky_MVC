@@ -9,6 +9,7 @@ namespace Bulky.DAL.Repository.Interface
     public interface IUnitOfWork
     {
         ICategoryRepository CategoryRepository { get; }
+        IProductRepository ProductRepository { get; }
         void Save();
     }
 }
