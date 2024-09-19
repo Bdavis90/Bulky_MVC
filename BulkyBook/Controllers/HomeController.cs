@@ -1,4 +1,4 @@
-using BulkyBook.Models;
+using Bulky.BAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
