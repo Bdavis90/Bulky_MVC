@@ -24,15 +24,31 @@ namespace Bulky.DAL.Repository
             _dbSet.Add(entity);
         }
 
-        public T Get(System.Linq.Expressions.Expression<Func<T, bool>> filter)
+        public T Get(System.Linq.Expressions.Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = _dbSet.Where(filter);
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var prop in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(prop);
+                }
+            }
             return query.FirstOrDefault();
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<T> GetAll(string? includeProperties = null)
         {
-            return _dbSet.ToList();
+            IQueryable<T> query = _dbSet;
+            if(!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach(var prop in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(prop);
+                }
+            }
+
+            return query.ToList();
         }
 
         public void Remove(T entity)

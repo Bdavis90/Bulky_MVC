@@ -20,7 +20,7 @@ namespace BulkyBook.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            var products = _unitOfWork.ProductRepository.GetAll().ToList();
+            var products = _unitOfWork.ProductRepository.GetAll(includeProperties:"Category");
             return View(products);
         }
 
@@ -60,6 +60,16 @@ namespace BulkyBook.Areas.Admin.Controllers
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath, @"images\product");
 
+                    if(!string.IsNullOrEmpty(pvm.Product.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, pvm.Product.ImageUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
                     using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                     {
                         file.CopyTo(fileStream);
@@ -68,7 +78,14 @@ namespace BulkyBook.Areas.Admin.Controllers
                     pvm.Product.ImageUrl = @"\images\product\" + fileName;
                 }
 
+                if(pvm.Product.Id == 0)
+                {
                 _unitOfWork.ProductRepository.Add(pvm.Product);
+
+                } else
+                {
+                    _unitOfWork.ProductRepository.Update(pvm.Product);
+                }
                 _unitOfWork.Save();
                 TempData["success"] = "Product created successfully";
                 return RedirectToAction("Index");
