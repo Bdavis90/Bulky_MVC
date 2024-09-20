@@ -1,11 +1,8 @@
 ﻿using Bulky.BAL.Models;
 using Bulky.BAL.Models.ViewModels;
-using Bulky.DAL.Repository;
 using Bulky.DAL.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.FileProviders;
 
 namespace BulkyBook.Areas.Admin.Controllers
 {
@@ -13,10 +10,12 @@ namespace BulkyBook.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -25,7 +24,7 @@ namespace BulkyBook.Areas.Admin.Controllers
             return View(products);
         }
 
-        public IActionResult Create()
+        public IActionResult Upsert(int? id)
         {
             IEnumerable<SelectListItem> catergoyList = _unitOfWork.CategoryRepository
             .GetAll()
@@ -37,15 +36,38 @@ namespace BulkyBook.Areas.Admin.Controllers
 
             var pv = new ProductViewModel() { Product = new Product(), CategoryList = catergoyList };
 
+            if (id is null || id == 0)
+            {
+                return View(pv);
 
-            return View(pv);
+            }
+            else
+            {
+                pv.Product = _unitOfWork.ProductRepository.Get(x => x.Id == id);
+                return View(pv);
+            }
+
         }
 
         [HttpPost]
-        public IActionResult Create(ProductViewModel pvm)
+        public IActionResult Upsert(ProductViewModel pvm, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file is not null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    pvm.Product.ImageUrl = @"\images\product\" + fileName;
+                }
+
                 _unitOfWork.ProductRepository.Add(pvm.Product);
                 _unitOfWork.Save();
                 TempData["success"] = "Product created successfully";
@@ -62,37 +84,6 @@ namespace BulkyBook.Areas.Admin.Controllers
                 });
             }
             return View(pvm);
-        }
-
-        public IActionResult Edit(int? id)
-        {
-            if (id is null || id == 0)
-            {
-                return NotFound();
-            }
-
-            var product = _unitOfWork.ProductRepository.Get(u => u.Id == id);
-            if (product is null)
-            {
-                return NotFound();
-            }
-
-
-            return View(product);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.ProductRepository.Update(product);
-                _unitOfWork.Save();
-                TempData["success"] = "Product updated successfully";
-                return RedirectToAction("Index");
-            }
-
-            return View();
         }
 
         public IActionResult Delete(int? id)
