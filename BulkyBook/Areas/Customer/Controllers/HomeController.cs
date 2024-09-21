@@ -19,8 +19,14 @@ namespace BulkyBook.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
-            var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
+            var products = _unitOfWork.ProductRepository.GetAll("Category");
             return View(products);
+        }
+
+        public IActionResult Details(int id)
+        {
+            var product = _unitOfWork.ProductRepository.Get(filter: x => x.Id == id, "Category");
+            return View(product);
         }
 
         public IActionResult Privacy()
