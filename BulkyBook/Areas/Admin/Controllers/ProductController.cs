@@ -20,7 +20,7 @@ namespace BulkyBook.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            var products = _unitOfWork.ProductRepository.GetAll(includeProperties:"Category");
+            var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
             return View(products);
         }
 
@@ -60,7 +60,7 @@ namespace BulkyBook.Areas.Admin.Controllers
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath, @"images\product");
 
-                    if(!string.IsNullOrEmpty(pvm.Product.ImageUrl))
+                    if (!string.IsNullOrEmpty(pvm.Product.ImageUrl))
                     {
                         var oldImagePath = Path.Combine(wwwRootPath, pvm.Product.ImageUrl.TrimStart('\\'));
 
@@ -78,16 +78,20 @@ namespace BulkyBook.Areas.Admin.Controllers
                     pvm.Product.ImageUrl = @"\images\product\" + fileName;
                 }
 
-                if(pvm.Product.Id == 0)
+                if (pvm.Product.Id == 0)
                 {
-                _unitOfWork.ProductRepository.Add(pvm.Product);
+                    _unitOfWork.ProductRepository.Add(pvm.Product);
+                    TempData["success"] = "Product created successfully";
 
-                } else
+                }
+                else
                 {
                     _unitOfWork.ProductRepository.Update(pvm.Product);
+                    TempData["success"] = "Product updated successfully";
+
                 }
                 _unitOfWork.Save();
-                TempData["success"] = "Product created successfully";
+
                 return RedirectToAction("Index");
             }
             else
@@ -136,6 +140,38 @@ namespace BulkyBook.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        #region API CALLS
+        //[HttpGet]
+        //public IActionResult GetAll()
+        //{
+        //    var products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category");
+        //    return Json(new { data = products });
+        //}
+
+        //[HttpDelete]
+        //public IActionResult Delete(int? id)
+        //{
+        //    var product = _unitOfWork.ProductRepository.Get(x => x.Id == id);
+        //    if (product is null)
+        //    {
+        //        return Json(new { success = false, message = "Error while deleting" });
+
+        //    }
+
+        //    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, product.ImageUrl.TrimStart('\\'));
+
+        //    if (System.IO.File.Exists(oldImagePath))
+        //    {
+        //        System.IO.File.Delete(oldImagePath);
+        //    }
+
+        //    _unitOfWork.ProductRepository.Remove(product);
+        //    _unitOfWork.Save();
+
+
+        //    return Json(new { success = true, message = "Delete Successful" }); 
+        //}
+        #endregion
 
     }
 }
