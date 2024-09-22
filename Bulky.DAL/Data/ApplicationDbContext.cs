@@ -1,10 +1,12 @@
 ﻿using Bulky.BAL.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace Bulky.DataAccess.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
 
         public DbSet<Category> Categories { get; set; }
@@ -16,6 +18,8 @@ namespace Bulky.DataAccess.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             var cats = new Category[] {
                 new Category { Id = 1, Name="Action", DisplayOrder = 1 },
                 new Category { Id = 2, Name="SciFi", DisplayOrder = 2 },
