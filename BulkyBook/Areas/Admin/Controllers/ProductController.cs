@@ -1,12 +1,15 @@
 ﻿using Bulky.BAL.Models;
 using Bulky.BAL.Models.ViewModels;
 using Bulky.DAL.Repository.Interface;
+using Bulky.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BulkyBook.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.ROLE_ADMIN)]
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

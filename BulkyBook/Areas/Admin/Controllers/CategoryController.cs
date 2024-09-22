@@ -1,10 +1,13 @@
 ﻿using Bulky.BAL.Models;
 using Bulky.DAL.Repository.Interface;
+using Bulky.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BulkyBook.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.ROLE_ADMIN)]
     public class CategoryController : Controller
     {
         private IUnitOfWork _unitOfWork;
